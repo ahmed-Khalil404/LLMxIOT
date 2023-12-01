@@ -1,0 +1,119 @@
+[
+    {
+        "id": "de0d9b37414d9492",
+        "type": "tab",
+        "label": "Flow 1",
+        "disabled": false,
+        "info": "",
+        "env": []
+    },
+    {
+        "id": "b59dc2e084896335",
+        "type": "http in",
+        "z": "de0d9b37414d9492",
+        "name": "",
+        "url": "output",
+        "method": "post",
+        "upload": false,
+        "swaggerDoc": "",
+        "x": 150,
+        "y": 180,
+        "wires": [
+            [
+                "4c3fdf7f2ec6bd64",
+                "8861cbda2daa8f6e",
+                "22e0c551e8e684e6"
+            ]
+        ]
+    },
+    {
+        "id": "4c3fdf7f2ec6bd64",
+        "type": "debug",
+        "z": "de0d9b37414d9492",
+        "name": "debug 1",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 600,
+        "y": 100,
+        "wires": []
+    },
+    {
+        "id": "70dc9d875ede20a1",
+        "type": "debug",
+        "z": "de0d9b37414d9492",
+        "name": "debug 2",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 660,
+        "y": 260,
+        "wires": []
+    },
+    {
+        "id": "8861cbda2daa8f6e",
+        "type": "function",
+        "z": "de0d9b37414d9492",
+        "name": "function 1",
+        "func": "var inputText = msg.payload.response;\n\nif (typeof inputText === 'string') {\n    var commandObj = {};\n    var regex = /\\{(.*?)\\}/g;\n    var matches = inputText.match(regex);\n\n    if (matches) {\n        matches.forEach(function (match) {\n            match = match.trim().toLowerCase();\n\n            if (match.includes(\"tv\") || match.includes(\"light\") || match.includes(\"speaker\")) {\n                var key = \"\";\n                var value = \"\";\n\n                if (match.includes(\"on\") || match.includes(\"off\")) {\n                    key = match.includes(\"tv\") ? \"tv\" : (match.includes(\"light\") ? \"light\" : \"speaker\");\n                    value = match.includes(\"on\") ? \"on\" : \"off\";\n                } else if (match.includes(\"speaker\")) {\n                    if (match.includes(\"up\")) {\n                        key = \"speaker\";\n                        value = \"up\";\n                    } else if (match.includes(\"down\")) {\n                        key = \"speaker\";\n                        value = \"down\";\n                    }\n                }\n\n                if (key && value) {\n                    commandObj[key] = value;\n                }\n            }\n        });\n    }\n\n    if (Object.keys(commandObj).length > 0) {\n        msg.payload = commandObj;\n    } else {\n        msg.payload = \"No valid commands (tv, light, speaker) inside curly braces found.\";\n    }\n} else {\n    node.warn(\"Input is not a valid text string. Payload: \" + JSON.stringify(msg.payload));\n    msg.payload = \"Input is not a valid text string.\";\n}\n\nreturn msg;\n",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 400,
+        "y": 240,
+        "wires": [
+            [
+                "70dc9d875ede20a1"
+            ]
+        ]
+    },
+    {
+        "id": "22e0c551e8e684e6",
+        "type": "http response",
+        "z": "de0d9b37414d9492",
+        "name": "Ok",
+        "statusCode": "200",
+        "headers": {},
+        "x": 450,
+        "y": 80,
+        "wires": []
+    },
+    {
+        "id": "0f7a7ae44c46e652",
+        "type": "inject",
+        "z": "de0d9b37414d9492",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "Hello! I'm Jarvis, your smart home assistant. What can I help you with today? {TV Off} {Light Off} {Speaker Off}. Please let me know if there is anything specific you would like to control or ask about.\"",
+        "payloadType": "str",
+        "x": 150,
+        "y": 300,
+        "wires": [
+            [
+                "8861cbda2daa8f6e"
+            ]
+        ]
+    }
+]
